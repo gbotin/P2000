@@ -1,0 +1,7 @@
+{
+    "configuration": "cpu=atmega328old",
+    "board": "arduino:avr:nano",
+    "programmer": "arduino:avrispmkii",
+    "port": "/dev/tty.usbserial-141430",
+    "sketch": "poulator2000.ino"
+}
