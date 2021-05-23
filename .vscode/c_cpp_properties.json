@@ -20,7 +20,7 @@
                 "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/eightanaloginputs",
                 "/Users/gbotin/Documents/Arduino/libraries/Time",
                 "/Users/gbotin/Documents/Arduino/libraries/Timezone/src",
-                "/Applications/Arduino.app/Contents/Java/libraries/Stepper/src",
+                "/Users/gbotin/Documents/Arduino/libraries/AccelStepper/src",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include-fixed",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/avr/include"
