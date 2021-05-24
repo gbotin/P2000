@@ -21,6 +21,7 @@
                 "/Users/gbotin/Documents/Arduino/libraries/Time",
                 "/Users/gbotin/Documents/Arduino/libraries/Timezone/src",
                 "/Users/gbotin/Documents/Arduino/libraries/AccelStepper/src",
+                "/Users/gbotin/Documents/Arduino/libraries/JC_Button/src",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include-fixed",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/avr/include"

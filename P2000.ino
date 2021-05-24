@@ -40,22 +40,17 @@
 
 // Config
 #define TIME_HEADER "T" // Header tag for serial time sync message
-// #define STEPPER_SPEED 10 // From 1 to 15
-#define STEPPER_SPEED 6 // From 1 to 15
-#define STEPPER_STEPS 2048 // Full step mode for more torque
-// #define STEPPER_STEPS 4096
-#define TRAVEL_REVOLUTIONS 24
 
-#define MOTOR_SPEED 600.0
-#define MOTOR_ACCEL 100.0
+// #define MOTOR_SPEED 600.0
+// #define MOTOR_ACCEL 100.0
+// #define MOTOR_MODE  AccelStepper::FULL4WIRE
 
-// STEPPER CONFIG
-#define STEPPER_STEPS_PER_REV 2048
+#define MOTOR_SPEED 1500.0
+#define MOTOR_ACCEL 500.0
+#define MOTOR_MODE  AccelStepper::HALF4WIRE
 
-// DOOR CONSTS
-// #define DOOR_STATE_UNDEF 0
-// #define DOOR_STATE_CLOSED 1
-// #define DOOR_STATE_OPENED 2
+// PROTO
+void blinkLED(int pin, int times = 1, int freq = 250);
 
 struct BusinessHours
 {
@@ -70,7 +65,7 @@ Timezone CE(CEST, CET);
 const BusinessHours dst_hours = { 7, 22 };
 const BusinessHours st_hours = { 7, 22 };
 
-AccelStepper Motor (AccelStepper::FULL4WIRE,
+AccelStepper Motor (MOTOR_MODE,
   STEPPER_PIN_1,
   STEPPER_PIN_3,
   STEPPER_PIN_2,
@@ -85,6 +80,9 @@ long homingLastPos = 0;
 long homingOpen = 0;
 long homingClose = 0;
 
+Button RunButton  (RUN_PIN);
+Button HomeButton (HOME_PIN);
+
 void setup()
 {
   Serial.begin(9600);
@@ -94,8 +92,8 @@ void setup()
 
   pinMode(DIRECTION_PIN, INPUT);
 
-  pinMode(RUN_PIN, INPUT_PULLUP);
-  pinMode(HOME_PIN, INPUT_PULLUP);
+  // pinMode(RUN_PIN, INPUT_PULLUP);
+  // pinMode(HOME_PIN, INPUT_PULLUP);
 
   pinMode(LED_PIN, OUTPUT);
 
@@ -109,6 +107,9 @@ void setup()
   Motor.setMaxSpeed(MOTOR_SPEED);
   Motor.setAcceleration(MOTOR_ACCEL);
   Motor.setCurrentPosition(0);
+
+  HomeButton.begin();
+  RunButton.begin();
 }
 
 // long getCurrentPosition_eeprom()
@@ -131,10 +132,9 @@ void setup()
 
 // }
 
-// long get
-
 void loop()
 {
+  btn_read();
   // if (Serial.available())
   // {
   //   processSyncMessage();
@@ -142,37 +142,42 @@ void loop()
 
   // printCurrentTime();
 
-  int value = analogRead(SENSOR_PIN);
-
+  // int value = analogRead(SENSOR_PIN);
   // Serial.println("Current luminosity is " + value);
   // tmp test
-  if (value > 500)
-  {
-    digitalWrite(LED_PIN, HIGH);
-  }
-  else
-  {
-    digitalWrite(LED_PIN, LOW);
-  }
+  // if (value > 500)
+  // {
+  //   digitalWrite(LED_PIN, HIGH);
+  // }
+  // else
+  // {
+  //   digitalWrite(LED_PIN, LOW);
+  // }
 
-  if (shouldRunHoming()) {
+  if (btn_runHoming()) {
     runHoming();
+    btn_read();
   }
 
-  if (!digitalRead(RUN_PIN) && digitalRead(DIRECTION_PIN)) {
-    Motor.runToNewPosition(homingClose);
+  if (btn_run()) {
+    if (isDirectionDown()) {
+      Motor.runToNewPosition(homingClose);
+    } else {
+      Motor.runToNewPosition(homingOpen);
+    }
+
+    btn_read();
   }
 
-  if (!digitalRead(RUN_PIN) && !digitalRead(DIRECTION_PIN)) {
-    Motor.runToNewPosition(homingOpen);
-  }
+  if (btn_setHome()) {
+    if (isDirectionDown()) {
+      homingClose = Motor.currentPosition();
+    } else {
+      homingOpen = Motor.currentPosition();
+    }
 
-  if (!digitalRead(HOME_PIN) && digitalRead(DIRECTION_PIN)) {
-    homingClose = Motor.currentPosition();
-  }
-
-  if (!digitalRead(HOME_PIN) && !digitalRead(DIRECTION_PIN)) {
-    homingOpen = Motor.currentPosition();
+    blinkLED(LED_PIN, 2, 500);
+    btn_read();
   }
 
   delay(100);
@@ -211,9 +216,25 @@ time_t requestSync()
 //   TODO
 // }
 
-bool shouldRunHoming()
+bool btn_runHoming()
 {
-  return !digitalRead(RUN_PIN) && !digitalRead(HOME_PIN);
+  return RunButton.pressedFor(1000) && HomeButton.pressedFor(1000);
+}
+
+bool btn_setHome()
+{
+  return HomeButton.pressedFor(3000) && RunButton.releasedFor(2000);
+}
+
+bool btn_run()
+{
+  return RunButton.pressedFor(1000) && HomeButton.releasedFor(2000);
+}
+
+void btn_read()
+{
+    HomeButton.read();
+    RunButton.read();
 }
 
 void printCurrentTime()
@@ -225,21 +246,20 @@ void printCurrentTime()
 
 void runHoming()
 {
+  int i = isDirectionDown() ? -1 : 1;
+
   homingLastPos = Motor.currentPosition();
   Motor.setCurrentPosition(0);
 
-  while (shouldRunHoming())
+  while (btn_runHoming())
   {
-    if (digitalRead(DIRECTION_PIN)) {
-      Motor.move(Motor.currentPosition() - 1);
-    } else {
-      Motor.move(Motor.currentPosition() + 1);
-    }
-
+    Motor.move(Motor.currentPosition() + i);
     Motor.run();
+
+    btn_read();
   }
 
-  if (digitalRead(DIRECTION_PIN)) {
+  if (isDirectionDown()) {
     Motor.setCurrentPosition(homingLastPos - Motor.currentPosition());
   } else {
     Motor.setCurrentPosition(homingLastPos + Motor.currentPosition());
@@ -290,4 +310,35 @@ void setHoming()
 //   // homing = -1;
 
 //   Serial.println("Homing complete.");
+}
+
+void blinkLED(int pin, int times = 1, int freq = 250)
+{
+  int lastState = digitalRead(pin);
+
+  if (lastState == HIGH)
+  {
+    digitalWrite(pin, LOW);
+    delay(freq);
+  }
+
+  for (size_t i = 0; i < times; i++)
+  {
+    digitalWrite(pin, HIGH);
+    delay(freq);
+    digitalWrite(pin, LOW);
+    delay(freq);
+  }
+
+  digitalWrite(pin, lastState);
+}
+
+bool isDirectionUp()
+{
+  return !digitalRead(DIRECTION_PIN);
+}
+
+bool isDirectionDown()
+{
+  return digitalRead(DIRECTION_PIN);
 }
