@@ -1,66 +1,72 @@
+#include "defines.h"
 #include <Arduino.h>
 #include <EEPROM.h>
 
-#define POS_CURR_EEPROM_ADDR 0
-#define POS_OPEN_EEPROM_ADDR 4
-#define POS_CLOSE_EEPROM_ADDR 8
-
-long EEPROMReadlong(long address) {
+long eeprom_readLong(long address)
+{
     Serial.println("read_eeprom");
-  long four = EEPROM.read(address);
-  long three = EEPROM.read(address + 1);
-  long two = EEPROM.read(address + 2);
-  long one = EEPROM.read(address + 3);
+    long four = EEPROM.read(address);
+    long three = EEPROM.read(address + 1);
+    long two = EEPROM.read(address + 2);
+    long one = EEPROM.read(address + 3);
 
-  return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
+    return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
 }
 
-void EEPROMUpdatelong(int address, long value) {
+void eeprom_updateLong(int address, long value)
+{
     Serial.println("write_eeprom");
-  byte four = (value & 0xFF);
-  byte three = ((value >> 8) & 0xFF);
-  byte two = ((value >> 16) & 0xFF);
-  byte one = ((value >> 24) & 0xFF);
+    byte four = (value & 0xFF);
+    byte three = ((value >> 8) & 0xFF);
+    byte two = ((value >> 16) & 0xFF);
+    byte one = ((value >> 24) & 0xFF);
 
-  EEPROM.update(address, four);
-  EEPROM.update(address + 1, three);
-  EEPROM.update(address + 2, two);
-  EEPROM.update(address + 3, one);
+    EEPROM.update(address, four);
+    EEPROM.update(address + 1, three);
+    EEPROM.update(address + 2, two);
+    EEPROM.update(address + 3, one);
 }
 
-long getCurrentPosition_eeprom()
+long eeprom_getCurrPosition()
 {
-    return EEPROMReadlong(POS_CURR_EEPROM_ADDR);
+    return eeprom_readLong(POS_CURR_EEPROM_ADDR);
 }
 
-void setCurrentPosition_eeprom(long pos)
+void eeprom_setCurrPosition(long pos)
 {
-    EEPROMUpdatelong(POS_CURR_EEPROM_ADDR, pos);
+    eeprom_updateLong(POS_CURR_EEPROM_ADDR, pos);
 }
 
-long getOpenPosition_eeprom()
+long eeprom_getOpenPosition()
 {
-    return EEPROMReadlong(POS_OPEN_EEPROM_ADDR);
+    return eeprom_readLong(POS_OPEN_EEPROM_ADDR);
 }
 
-void setOpenPosition_eeprom(long pos)
+void eeprom_setOpenPosition(long pos)
 {
-    EEPROMUpdatelong(POS_OPEN_EEPROM_ADDR, pos);
+    eeprom_updateLong(POS_OPEN_EEPROM_ADDR, pos);
 }
 
-long getClosePosition_eeprom()
+long eeprom_getClosePosition()
 {
-    return EEPROMReadlong(POS_CLOSE_EEPROM_ADDR);
+    return eeprom_readLong(POS_CLOSE_EEPROM_ADDR);
 }
 
-void setClosePosition_eeprom(long pos)
+void eeprom_setClosePosition(long pos)
 {
-    EEPROMUpdatelong(POS_CLOSE_EEPROM_ADDR, pos);
+    eeprom_updateLong(POS_CLOSE_EEPROM_ADDR, pos);
 }
 
-void reset_eeprom()
+void eeprom_setDirectionPosition(long pos, Direction direction)
 {
-    for (int i = 0 ; i < EEPROM.length() ; i++) {
+    int addr = direction == Direction::Up ? POS_OPEN_EEPROM_ADDR : POS_CLOSE_EEPROM_ADDR;
+    eeprom_updateLong(addr, pos);
+}
+
+void eeprom_reset()
+{
+    for (int i = 0; i < EEPROM.length(); i++)
+    {
         EEPROM.write(i, 0);
     }
 }

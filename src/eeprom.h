@@ -1,13 +1,15 @@
-long EEPROMReadlong(long address);
-void EEPROMUpdatelong(int address, long value);
+long eeprom_readLong(long address);
+void eeprom_updateLong(int address, long value);
 
-long getCurrentPosition_eeprom();
-void setCurrentPosition_eeprom(long pos);
+long eeprom_getCurrPosition();
+void eeprom_setCurrPosition(long pos);
 
-long getOpenPosition_eeprom();
-void setOpenPosition_eeprom(long pos);
+long eeprom_getOpenPosition();
+void eeprom_setOpenPosition(long pos);
 
-long getClosePosition_eeprom();
-void setClosePosition_eeprom(long pos);
+long eeprom_getClosePosition();
+void eeprom_setClosePosition(long pos);
 
-void reset_eeprom();
+void eeprom_setDirectionPosition(long pos, Direction direction);
+
+void eeprom_reset();

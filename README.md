@@ -5,6 +5,7 @@
 
 ### Utils :
 - Send current time via Serial : date +T%s\n > /dev/tty.usbserial-141410
+- Reset EEPROM : echo 'eeprom_reset' > /dev/tty.usbserial-1220
 
 ### Infos :
 - Stepper : 28byj-48
