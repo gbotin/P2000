@@ -14,49 +14,59 @@ AccelStepper Motor(
     STEPPER_PIN_2,
     STEPPER_PIN_4);
 
-// long currPosition = 0;
-// long openPosition = 0;
-// long closePosition = 0;
+long currPosition = 0;
+long openPosition = 0;
+long closePosition = 0;
 
-Position position;
+bool door_shouldClose(Direction direction)
+{
+    return direction == Direction::Down && currPosition != closePosition;
+}
 
-void door_setup(Position pos)
+bool door_shouldOpen(Direction direction)
+{
+    return direction == Direction::Up && currPosition != openPosition;
+}
+
+long door_getPosition()
+{
+    return currPosition;
+}
+
+void door_setup(long curr = 0, long open = 0, long close = 0)
 {
     pinMode(STEPPER_PIN_1, OUTPUT);
     pinMode(STEPPER_PIN_2, OUTPUT);
     pinMode(STEPPER_PIN_3, OUTPUT);
     pinMode(STEPPER_PIN_4, OUTPUT);
 
-    position = pos;
+    currPosition = curr;
+    openPosition = open;
+    closePosition = close;
 
     Motor.setMaxSpeed(MOTOR_SPEED);
     Motor.setAcceleration(MOTOR_ACCEL);
-    Motor.setCurrentPosition(position.curr);
-}
-
-long door_getPosition()
-{
-    return position.curr;
+    Motor.setCurrentPosition(currPosition);
 }
 
 void door_set(Direction direction, void (*save)(long pos, Direction dir))
 {
-    if (direction == Direction::Down && position.close != Motor.currentPosition())
+    if (door_shouldClose(direction))
     {
         Serial.println("door_set close");
-        position.close = Motor.currentPosition();
-        save(position.close, direction);
+        closePosition = Motor.currentPosition();
+        save(closePosition, direction);
     }
 
-    if (direction == Direction::Up && position.open != Motor.currentPosition())
+    if (door_shouldOpen(direction))
     {
         Serial.println("door_set open");
-        position.open = Motor.currentPosition();
-        save(position.open, direction);
+        openPosition = Motor.currentPosition();
+        save(openPosition, direction);
     }
 }
 
-void door_move(Direction direction, bool (*cond)(), void (*after)())
+void door_move(Direction direction, bool (*cond)(), void (*after)(), void (*save)(long pos))
 {
     Serial.println("door_move");
     int i = direction == Direction::Down ? -1 : 1;
@@ -72,21 +82,30 @@ void door_move(Direction direction, bool (*cond)(), void (*after)())
         after();
     }
 
-    position.curr = lastPosition + Motor.currentPosition();
-    Motor.setCurrentPosition(position.curr);
+    currPosition = lastPosition + Motor.currentPosition();
+    Motor.setCurrentPosition(currPosition);
+    save(currPosition);
 }
 
-void door_toggle(Direction direction)
+void door_toggle(Direction direction, void (*save)(long pos))
 {
+    if (!door_shouldOpen(direction) && !door_shouldClose(direction))
+    {
+        return;
+    }
+
     if (direction == Direction::Down)
     {
         Serial.println("door_toggle close");
-        Motor.runToNewPosition(position.close);
+        Motor.runToNewPosition(closePosition);
     }
 
     if (direction == Direction::Up)
     {
         Serial.println("door_toggle open");
-        Motor.runToNewPosition(position.open);
+        Motor.runToNewPosition(openPosition);
     }
+
+    currPosition = Motor.currentPosition();
+    save(currPosition);
 }

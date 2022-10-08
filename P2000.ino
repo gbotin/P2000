@@ -56,26 +56,18 @@ void setup()
     pinMode(LED_PIN, OUTPUT);
 
     //   setSyncProvider(requestSync); // Set function to call when sync required
-    Position position = Position(
+
+    ctrl_setup();
+    door_setup(
         eeprom_getCurrPosition(),
         eeprom_getOpenPosition(),
         eeprom_getClosePosition()
     );
-
-    door_setup(position);
-    ctrl_setup();
 }
 
 void loop()
 {
     ctrl_read();
-
-    //   Serial.println("---");
-    //   Serial.println("currpos : " + String(Motor.currentPosition()) + " / " + String(currentPosition));
-    //   Serial.println("openpos : " + String(openPosition));
-    //   Serial.println("closepos : " + String(closePosition));
-    //   Serial.println(isDirectionDown() ? "down" : "up");
-    //   Serial.println("---");
 
     if (Serial.available())
     {
@@ -102,13 +94,12 @@ void loop()
 
     if (ctrl_move())
     {
-        door_move(ctrl_getDirection(), &ctrl_move, &ctrl_read);
-        eeprom_setCurrPosition(door_getPosition());
+        door_move(ctrl_getDirection(), &ctrl_move, &ctrl_read, &eeprom_setCurrPosition);
     }
 
     if (ctrl_toggle())
     {
-        door_toggle(ctrl_getDirection());
+        door_toggle(ctrl_getDirection(), &eeprom_setCurrPosition);
     }
 
     if (ctrl_set())
@@ -118,14 +109,6 @@ void loop()
 
     delay(100);
 }
-
-// bool shouldOpen() {
-//   TODO
-// }
-
-// bool shouldClose() {
-//   TODO
-// }
 
 // void printCurrentTime()
 // {

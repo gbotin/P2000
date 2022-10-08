@@ -31,17 +31,3 @@ enum Direction
     Up,
     Down
 };
-
-struct Position
-{
-    long curr;
-    long open;
-    long close;
-
-    Position (long curr = 0, long open = 0, long close = 0)
-    {
-        this->curr = curr;
-        this->curr = open;
-        this->curr = close;
-    }
-};
