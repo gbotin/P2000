@@ -23,6 +23,7 @@
                 "/Users/gbotin/Documents/Arduino/libraries/JC_Button/src",
                 "/Users/gbotin/Documents/Arduino/libraries/AccelStepper/src",
                 "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/libraries/EEPROM/src",
+                "/Users/gbotin/Documents/Arduino/libraries/Dusk2Dawn",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include-fixed",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/avr/include"

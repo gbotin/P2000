@@ -21,33 +21,17 @@
 
 // #define SENSOR_PIN A0
 
-// Config
-// #define TIME_HEADER "T" // Header tag for serial time sync message
-
 #include "src/defines.h"
-
 #include "src/controls.h"
 #include "src/door.h"
 #include "src/eeprom.h"
 #include "src/led.h"
 
-// struct BusinessHours
-// {
-//   uint8_t opening;
-//   uint8_t closing;
-// };
-
-// const TimeChangeRule CEST = { "CEST", Last, Sun, Mar, 2, 120 }; // Central European Summer Time
-// const TimeChangeRule CET = { "CET", Last, Sun, Oct, 3, 60 };    // Central European Standard Time
-// Timezone CE(CEST, CET);
-
-// const BusinessHours dst_hours = { 7, 22 };
-// const BusinessHours st_hours = { 7, 22 };
+const TimeChangeRule CEST = {"CEST", Last, Sun, Mar, 2, 120}; // Central European Summer Time
+const TimeChangeRule CET = {"CET", Last, Sun, Oct, 3, 60};    // Central European Standard Time
+Timezone CE(CEST, CET);
 
 // bool isDST = false; // Daylight Saving Time (nb. Summer hours)
-
-// short int state = DOOR_STATE_UNDEF;
-// long homing = -1;
 
 void setup()
 {
@@ -61,8 +45,7 @@ void setup()
     door_setup(
         eeprom_getCurrPosition(),
         eeprom_getOpenPosition(),
-        eeprom_getClosePosition()
-    );
+        eeprom_getClosePosition());
 }
 
 void loop()
@@ -71,12 +54,10 @@ void loop()
 
     if (Serial.available())
     {
-        // processSyncMessage();
-
         String command = Serial.readString();
         command.trim();
 
-        if (command == "eeprom_reset")
+        if (command.startsWith("eeprom_reset"))
         {
             Serial.println("Resetting EEPROM...");
 
@@ -85,9 +66,25 @@ void loop()
             Serial.println("Done.");
             led_blink(LED_PIN, 2, 500);
         }
-    }
 
-    // printCurrentTime();
+        if (command.startsWith("time_set"))
+        {
+            String arg = command.substring(command.indexOf(' ') + 1, command.length());
+
+            unsigned long pctime = arg.toInt();
+            unsigned long localtime = CE.toLocal(pctime);
+
+            // isDST = CE.locIsDST(localtime);
+            setTime(localtime);
+
+            Serial.println("time set to " + getFormattedCurrentTime());
+        }
+
+        if (command.startsWith("time_print"))
+        {
+            Serial.println(getFormattedCurrentTime());
+        }
+    }
 
     // working
     // showLuminosity();
@@ -110,27 +107,13 @@ void loop()
     delay(100);
 }
 
-// void printCurrentTime()
-// {
-//   char buffer[50];
-//   sprintf(buffer, "%.2d:%.2d:%.2d", hour(), minute(), second());
-//   Serial.println(buffer);
-// }
+String getFormattedCurrentTime()
+{
+    char buffer[50];
+    sprintf(buffer, "%.2d:%.2d:%.2d", hour(), minute(), second());
+    return String(buffer);
+}
 
-// void processSyncMessage()
-// {
-//   unsigned long pctime;
-//   unsigned long localtime;
-
-//   if (Serial.find(TIME_HEADER))
-//   {
-//     pctime = Serial.parseInt();
-//     localtime = CE.toLocal(pctime);
-
-//     isDST = CE.locIsDST(localtime);
-//     setTime(localtime);
-//   }
-// }
 
 // BusinessHours getBusinessHours ()
 // {

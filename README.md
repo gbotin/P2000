@@ -4,7 +4,7 @@
 - homing step motor - buy homing switch
 
 ### Utils :
-- Send current time via Serial : date +T%s\n > /dev/tty.usbserial-141410
+- Send current time via Serial : echo "time_set $(date +%s)" > /dev/tty.usbserial-1220
 - Reset EEPROM : echo 'eeprom_reset' > /dev/tty.usbserial-1220
 
 ### Infos :
@@ -18,3 +18,4 @@
 - https://github.com/PaulStoffregen/Time
 - http://github.com/JChristensen/Timezone
 - https://github.com/arduino-libraries/Stepper
+- https://github.com/dmkishi/Dusk2Dawn
