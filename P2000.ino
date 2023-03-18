@@ -15,8 +15,8 @@
 // https://github.com/rlogiacco/CircularBuffer
 
 // https://github.com/PaulStoffregen/Time
-#include <Time.h>
-#include <TimeLib.h>
+// #include <Time.h>
+// #include <TimeLib.h>
 
 // http://github.com/JChristensen/Timezone
 #include <Timezone.h>
@@ -70,55 +70,73 @@ void loop()
 {
     ctrl_read();
 
-    // if (Serial.available())
-    // {
-    //     String command = Serial.readString();
-    //     command.trim();
+    if (Serial.available())
+    {
+        String command = Serial.readString();
+        command.trim();
 
-    //     if (command.startsWith("eeprom_reset"))
-    //     {
-    //         Serial.println("Resetting EEPROM...");
+        if (command.startsWith("eeprom_reset"))
+        {
+            Serial.println("Resetting EEPROM...");
 
-    //         eeprom_reset();
+            eeprom_reset();
 
-    //         Serial.println("Done.");
-    //         led_blink(LED_PIN, 2, 500);
-    //     }
+            Serial.println("Done.");
+            led_blink(LED_PIN, 2, 500);
+        }
 
-    //     if (command.startsWith("time_set"))
-    //     {
-    //         String arg = command.substring(command.indexOf(' ') + 1, command.length());
+        if (command.startsWith("time_set"))
+        {
+            String arg = command.substring(command.indexOf(' ') + 1, command.length());
 
-    //         unsigned long pctime = arg.toInt();
-    //         unsigned long localtime = CE.toLocal(pctime);
+            unsigned long pctime = arg.toInt();
+            unsigned long localtime = CE.toLocal(pctime);
 
-    //         setTime(localtime);
+            setTime(localtime);
 
-    //         // Serial.println("Time set to :" + getFormattedCurrentTime());
-    //         Serial.println("Time set to : ");
-    //         digitalClockDisplay();
-    //         Serial.println("---");
-    //     }
+            Serial.println("Time set to : " + getFormattedCurrentDateTime());
+            Serial.println("---");
+        }
 
-    //     if (command.startsWith("time_print"))
-    //     {
-    //         Serial.println(getFormattedCurrentTime());
+        if (command.startsWith("date_set"))
+        {
+            String arg = command.substring(command.indexOf(' ') + 1, command.length());
 
-    //         int sunrise = home.sunrise(year(), month(), day(), CE.locIsDST(now()));
-    //         int sunset = home.sunset(year(), month(), day(), CE.locIsDST(now()));
+            int day;
+            int month;
+            int year;
+            sscanf(arg.c_str(), "%2d/%2d/%4d", &day, &month, &year);
 
-    //         char time[6];
-    //         Dusk2Dawn::min2str(time, sunrise);
-    //         Serial.println("sunrise " + String(time));
-    //         Dusk2Dawn::min2str(time, sunset);
-    //         Serial.println("sunset " + String(time));
-    //     }
+            DateTime date(year, month, day, 0, 0, 0);
 
-    //     if (command.startsWith("time_hours"))
-    //     {
-    //         getCloseTime();
-    //     }
-    // }
+            unsigned long localtime = CE.toLocal(date.unixtime());
+            setTime(localtime);
+
+            Serial.println("Date set to : " + getFormattedCurrentDateTime());
+            Serial.println("---");
+        }
+
+        if (command.startsWith("time_program"))
+        {
+            Serial.println("Current Time :");
+            Serial.println(getFormattedCurrentDateTime());
+
+            int sunrise = home.sunrise(year(), month(), day(), CE.locIsDST(now()));
+            int sunset = home.sunset(year(), month(), day(), CE.locIsDST(now()));
+
+            char time[6];
+            Dusk2Dawn::min2str(time, sunrise);
+            Serial.println("Sunrise at " + String(time));
+
+            Dusk2Dawn::min2str(time, sunset);
+            Serial.println("Sunset at " + String(time));
+
+            Serial.println("Open at " + getFormattedTime(getOpenTime().unixtime()));
+            Serial.println("Close at " + getFormattedTime(getCloseTime().unixtime()));
+
+            Serial.println("---");
+        }
+    }
 
     // working
     // showLuminosity();
@@ -142,46 +160,35 @@ void loop()
     delay(100);
 }
 
-// time_t getCloseTime()
-// {
-//     int close_time = home.sunset(year(), month(), day(), CE.locIsDST(now()));
-//     int h_close_time = close_time / 60;
-//     int m_close_time = close_time - (60 * h_close_time);
+DateTime getCloseTime()
+{
+    int close_time = home.sunset(year(), month(), day(), CE.locIsDST(now()));
+    int h_close_time = close_time / 60;
+    int m_close_time = close_time - (60 * h_close_time);
 
-//     // int s_close_time = close_time * 60;
+    DateTime close_dt(year(), month(), day(), h_close_time, m_close_time, 0);
+    close_dt = close_dt + TimeSpan(S_DELTA_CLOSE);
 
-//     Serial.println("---");
-//     Serial.println("Current Time : ");
-//     digitalClockDisplay();
+    DateTime close_min_dt(year(), month(), day(), 0, 0, 0);
+    close_min_dt = close_min_dt + TimeSpan(S_MIN_CLOSE);
 
-//     DateTime close_dt(year(), month(), day(), h_close_time, m_close_time, 0);
-//     // close_dt = close_dt + TimeSpan(3600);
+    return close_dt > close_min_dt ? close_dt : close_min_dt;
+}
 
-//     DateTime close_min_dt(year(), month(), day(), 0, 0, 0);
-//     // close_min_dt = close_min_dt + TimeSpan(68400);
+DateTime getOpenTime()
+{
+    int open_time = home.sunrise(year(), month(), day(), CE.locIsDST(now()));
+    int h_open_time = open_time / 60;
+    int m_open_time = open_time - (60 * h_open_time);
 
-//     // DateTime real_close_dt = close_dt > close_min_dt ? close_dt : close_min_dt;
+    DateTime open_dt(year(), month(), day(), h_open_time, m_open_time, 0);
+    open_dt = open_dt + TimeSpan(S_DELTA_OPEN);
 
-//     Serial.println(close_dt.toString("YYYY MM DD hh:mm:ss"));
-//     Serial.println(close_min_dt.toString("YYYY MM DD hh:mm:ss"));
-//     Serial.println("---");
+    DateTime open_min_dt(year(), month(), day(), 0, 0, 0);
+    open_min_dt = open_min_dt + TimeSpan(S_MIN_OPEN);
 
-//     // int test = year() + month() + day() + close_time;
-//     //  + " " + test
-
-//     // time_t delta_close_time = close_time + DELTA_CLOSE;
-//     // time_t min_close_time = year() + month() + day() + MIN_TIME_CLOSE;
-
-
-//     // digitalClockDisplayTest(year() + month() + day() + close_time);
-//     // digitalClockDisplay(delta_close_time);
-//     // digitalClockDisplay(min_close_time);
-// }
-
-// time_t getOpenTime()
-// {
-
-// }
+    return open_dt > open_min_dt ? open_dt : open_min_dt;
+}
 
 // bool time_shouldClose()
 // {
@@ -230,6 +237,13 @@ String getFormattedTime(time_t t)
     return String(buffer);
 }
 
+String getFormattedDateTime(time_t t)
+{
+    char buffer[50];
+    sprintf(buffer, "%.2d/%.2d/%.4d %.2d:%.2d:%.2d", day(t), month(t), year(t), hour(t), minute(t), second(t));
+    return String(buffer);
+}
+
 String getFormattedCurrentTime()
 {
     char buffer[50];
@@ -237,42 +251,9 @@ String getFormattedCurrentTime()
     return String(buffer);
 }
 
-void printDigits(int digits)
+String getFormattedCurrentDateTime()
 {
-    // utility function for digital clock display: prints preceding colon and leading 0
-    Serial.print(":");
-    if (digits < 10)
-        Serial.print('0');
-    Serial.print(digits);
-}
-
-void digitalClockDisplayTest(time_t t)
-{
-    // digital clock display of the time
-    Serial.print(hour(t));
-    printDigits(minute(t));
-    printDigits(second(t));
-    Serial.print(" ");
-    Serial.print(day(t));
-    Serial.print(" ");
-    Serial.print(month(t));
-    Serial.print(" ");
-    Serial.print(year(t));
-    Serial.println();
-}
-
-
-void digitalClockDisplay()
-{
-    // digital clock display of the time
-    Serial.print(hour());
-    printDigits(minute());
-    printDigits(second());
-    Serial.print(" ");
-    Serial.print(day());
-    Serial.print(" ");
-    Serial.print(month());
-    Serial.print(" ");
-    Serial.print(year());
-    Serial.println();
+    char buffer[50];
+    sprintf(buffer, "%.2d/%.2d/%.4d %.2d:%.2d:%.2d", day(), month(), year(), hour(), minute(), second());
+    return String(buffer);
 }

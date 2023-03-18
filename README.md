@@ -5,7 +5,7 @@
 
 ### Utils :
 - Read current time : echo "time_print" > /dev/tty.usbserial-1230
-- Send current time : echo "time_set $(date +%s)" > /dev/tty.usbserial-1230
+- Send current time : echo "time_set $(date +%s)" > /dev/tty.usbserial-1440
 - Reset EEPROM : echo 'eeprom_reset' > /dev/tty.usbserial-1230
 
 ### Infos :
