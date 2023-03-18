@@ -31,8 +31,8 @@ void ctrl_read()
 
 void ctrl_setup()
 {
-    // pinMode(RUN_PIN, INPUT_PULLUP);
-    // pinMode(HOME_PIN, INPUT_PULLUP);
+    pinMode(RUN_PIN, INPUT_PULLUP);
+    pinMode(HOME_PIN, INPUT_PULLUP);
     pinMode(DIRECTION_PIN, INPUT);
 
     HomeButton.begin();

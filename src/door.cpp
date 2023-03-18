@@ -6,7 +6,6 @@
 #include "defines.h"
 
 #define MOTOR_MODE AccelStepper::HALF4WIRE
-// #define MOTOR_MODE AccelStepper::FULL4WIRE
 
 AccelStepper Motor(
     MOTOR_MODE,
@@ -46,10 +45,10 @@ long door_getPosition()
 
 void door_setup(long curr = 0, long open = 0, long close = 0)
 {
-    // pinMode(STEPPER_PIN_1, OUTPUT);
-    // pinMode(STEPPER_PIN_2, OUTPUT);
-    // pinMode(STEPPER_PIN_3, OUTPUT);
-    // pinMode(STEPPER_PIN_4, OUTPUT);
+    pinMode(STEPPER_PIN_1, OUTPUT);
+    pinMode(STEPPER_PIN_2, OUTPUT);
+    pinMode(STEPPER_PIN_3, OUTPUT);
+    pinMode(STEPPER_PIN_4, OUTPUT);
 
     currPosition = curr;
     openPosition = open;
@@ -57,7 +56,7 @@ void door_setup(long curr = 0, long open = 0, long close = 0)
 
     Motor.setMaxSpeed(MOTOR_SPEED);
     Motor.setAcceleration(MOTOR_ACCEL);
-    // Motor.setCurrentPosition(currPosition);
+    Motor.setCurrentPosition(currPosition);
 }
 
 void door_set(Direction direction, void (*save)(long pos, Direction dir))
@@ -79,29 +78,22 @@ void door_set(Direction direction, void (*save)(long pos, Direction dir))
 
 void door_move(Direction direction, bool (*cond)(), void (*after)(), void (*save)(long pos))
 {
-    Serial.println("door_move");
     int i = direction == Direction::Down ? -1 : 1;
 
-
-    // Motor.setMaxSpeed(10000);
-    // Motor.setAcceleration(1000);
-    // long lastPosition = Motor.currentPosition();
+    long lastPosition = Motor.currentPosition();
     Motor.setCurrentPosition(0);
 
     while (cond())
     {
-        Serial.println("inside while");
-        Motor.move(Motor.currentPosition() + i * 1);
+        Motor.move(Motor.currentPosition() + i);
         Motor.run();
 
-        // after();
+        after();
     }
 
-    Serial.println("leave while");
-
-    // currPosition = lastPosition + Motor.currentPosition();
-    // Motor.setCurrentPosition(currPosition);
-    // save(currPosition);
+    currPosition = lastPosition + Motor.currentPosition();
+    Motor.setCurrentPosition(currPosition);
+    save(currPosition);
 }
 
 void door_toggle(Direction direction, void (*save)(long pos))

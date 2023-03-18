@@ -22,10 +22,10 @@
 #include <Timezone.h>
 
 // https://github.com/dmkishi/Dusk2Dawn
-// #include <Dusk2Dawn.h>
+#include <Dusk2Dawn.h>
 
 // https://github.com/adafruit/RTClib
-// #include <RTClib.h>
+#include <RTClib.h>
 
 // #define SENSOR_PIN A0
 
@@ -35,15 +35,15 @@
 #include "src/eeprom.h"
 #include "src/led.h"
 
-// #define LAT 50.62448840748527
-// #define LNG 2.6875116810701773
-// #define TMZ 1
+#define LAT 50.62448840748527
+#define LNG 2.6875116810701773
+#define TMZ 1
 
 const TimeChangeRule CEST = {"CEST", Last, Sun, Mar, 2, 120}; // Central European Summer Time
 const TimeChangeRule CET = {"CET", Last, Sun, Oct, 3, 60};    // Central European Standard Time
 Timezone CE(CEST, CET);
 
-// Dusk2Dawn home(LAT, LNG, TMZ);
+Dusk2Dawn home(LAT, LNG, TMZ);
 
 #define S_DELTA_OPEN  3600 // 1H
 #define S_DELTA_CLOSE 3600 // 1H
@@ -51,25 +51,11 @@ Timezone CE(CEST, CET);
 #define S_MIN_OPEN 28800 // 1970-01-01 9:00:00
 #define S_MIN_CLOSE 68400 // 1970-01-01 19:00:00
 
-#include <AccelStepper.h>
-#define MOTOR_MODE AccelStepper::HALF4WIRE
-AccelStepper Motor(
-    MOTOR_MODE,
-    STEPPER_PIN_1,
-    STEPPER_PIN_3,
-    STEPPER_PIN_2,
-    STEPPER_PIN_4);
-
 void setup()
 {
     Serial.begin(9600);
 
     pinMode(LED_PIN, OUTPUT);
-
-    pinMode(STEPPER_PIN_1, OUTPUT);
-    pinMode(STEPPER_PIN_2, OUTPUT);
-    pinMode(STEPPER_PIN_3, OUTPUT);
-    pinMode(STEPPER_PIN_4, OUTPUT);
 
     //   setSyncProvider(requestSync); // Set function to call when sync required
 
@@ -140,42 +126,20 @@ void loop()
 
     if (ctrl_move())
     {
-        Serial.println("move from P2000");
-        // door_move(ctrl_getDirection(), &ctrl_move, &ctrl_read, &eeprom_setCurrPosition);
-
-        int i = ctrl_getDirection() == Direction::Down ? -1 : 1;
-
-
-        Motor.setMaxSpeed(2000);
-        Motor.setAcceleration(100);
-        // long lastPosition = Motor.currentPosition();
-        Motor.setCurrentPosition(0);
-        Motor.setSpeed(1000);
-
-        while (ctrl_move())
-        {
-            Serial.println("inside while");
-            // Motor.move(Motor.currentPosition() + i * 1000);
-            Motor.move(i * 10);
-            Motor.run();
-
-            // ctrl_read();
-        }
-
-        Serial.println("leave while");
+        door_move(ctrl_getDirection(), &ctrl_move, &ctrl_read, &eeprom_setCurrPosition);
     }
 
-    // if (ctrl_toggle())
-    // {
-    //     door_toggle(ctrl_getDirection(), &eeprom_setCurrPosition);
-    // }
+    if (ctrl_toggle())
+    {
+        door_toggle(ctrl_getDirection(), &eeprom_setCurrPosition);
+    }
 
-    // if (ctrl_set())
-    // {
-    //     door_set(ctrl_getDirection(), &eeprom_setDirectionPosition);
-    // }
+    if (ctrl_set())
+    {
+        door_set(ctrl_getDirection(), &eeprom_setDirectionPosition);
+    }
 
-    // delay(100);
+    delay(100);
 }
 
 // time_t getCloseTime()

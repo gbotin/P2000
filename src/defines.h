@@ -15,9 +15,6 @@
 // upwards max speed at half step + 300g = 840 grand MAX
 // upwards max sans charge at half step 1700
 
-// #define MOTOR_SPEED 600.0
-// #define MOTOR_ACCEL 100.0
-// #define MOTOR_MODE  AccelStepper::FULL4WIRE
 #define MOTOR_SPEED 1000.0 // 1500.0
 #define MOTOR_ACCEL 500.0
 
