@@ -6,6 +6,7 @@
 #include "defines.h"
 
 #define MOTOR_MODE AccelStepper::HALF4WIRE
+// #define MOTOR_MODE AccelStepper::FULL4WIRE
 
 AccelStepper Motor(
     MOTOR_MODE,
@@ -18,14 +19,24 @@ long currPosition = 0;
 long openPosition = 0;
 long closePosition = 0;
 
+bool door_isClose()
+{
+    return currPosition == closePosition;
+}
+
+bool door_isOpen()
+{
+    return currPosition == openPosition;
+}
+
 bool door_shouldClose(Direction direction)
 {
-    return direction == Direction::Down && currPosition != closePosition;
+    return direction == Direction::Down && !door_isClose();
 }
 
 bool door_shouldOpen(Direction direction)
 {
-    return direction == Direction::Up && currPosition != openPosition;
+    return direction == Direction::Up && !door_isOpen();
 }
 
 long door_getPosition()
@@ -35,10 +46,10 @@ long door_getPosition()
 
 void door_setup(long curr = 0, long open = 0, long close = 0)
 {
-    pinMode(STEPPER_PIN_1, OUTPUT);
-    pinMode(STEPPER_PIN_2, OUTPUT);
-    pinMode(STEPPER_PIN_3, OUTPUT);
-    pinMode(STEPPER_PIN_4, OUTPUT);
+    // pinMode(STEPPER_PIN_1, OUTPUT);
+    // pinMode(STEPPER_PIN_2, OUTPUT);
+    // pinMode(STEPPER_PIN_3, OUTPUT);
+    // pinMode(STEPPER_PIN_4, OUTPUT);
 
     currPosition = curr;
     openPosition = open;
@@ -46,7 +57,7 @@ void door_setup(long curr = 0, long open = 0, long close = 0)
 
     Motor.setMaxSpeed(MOTOR_SPEED);
     Motor.setAcceleration(MOTOR_ACCEL);
-    Motor.setCurrentPosition(currPosition);
+    // Motor.setCurrentPosition(currPosition);
 }
 
 void door_set(Direction direction, void (*save)(long pos, Direction dir))
@@ -71,20 +82,26 @@ void door_move(Direction direction, bool (*cond)(), void (*after)(), void (*save
     Serial.println("door_move");
     int i = direction == Direction::Down ? -1 : 1;
 
-    long lastPosition = Motor.currentPosition();
+
+    // Motor.setMaxSpeed(10000);
+    // Motor.setAcceleration(1000);
+    // long lastPosition = Motor.currentPosition();
     Motor.setCurrentPosition(0);
 
     while (cond())
     {
-        Motor.move(Motor.currentPosition() + i);
+        Serial.println("inside while");
+        Motor.move(Motor.currentPosition() + i * 1);
         Motor.run();
 
-        after();
+        // after();
     }
 
-    currPosition = lastPosition + Motor.currentPosition();
-    Motor.setCurrentPosition(currPosition);
-    save(currPosition);
+    Serial.println("leave while");
+
+    // currPosition = lastPosition + Motor.currentPosition();
+    // Motor.setCurrentPosition(currPosition);
+    // save(currPosition);
 }
 
 void door_toggle(Direction direction, void (*save)(long pos))

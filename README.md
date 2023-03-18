@@ -4,8 +4,9 @@
 - homing step motor - buy homing switch
 
 ### Utils :
-- Send current time via Serial : echo "time_set $(date +%s)" > /dev/tty.usbserial-1220
-- Reset EEPROM : echo 'eeprom_reset' > /dev/tty.usbserial-1220
+- Read current time : echo "time_print" > /dev/tty.usbserial-1230
+- Send current time : echo "time_set $(date +%s)" > /dev/tty.usbserial-1230
+- Reset EEPROM : echo 'eeprom_reset' > /dev/tty.usbserial-1230
 
 ### Infos :
 - Stepper : 28byj-48
