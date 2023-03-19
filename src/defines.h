@@ -6,6 +6,18 @@
 #define RUN_PIN 9
 #define HOME_PIN 10
 
+// LOCATION
+#define LAT 50.62448840748527
+#define LNG 2.6875116810701773
+#define TMZ 1
+
+// DOOR TIMING
+#define S_DELTA_OPEN 0     // 0H
+#define S_DELTA_CLOSE 3600 // 1H
+
+#define S_MIN_OPEN 32400  // 1970-01-01 09:00:00 GMT+0
+#define S_MIN_CLOSE 68400 // 1970-01-01 19:00:00 GMT+0
+
 // STEPPER
 #define STEPPER_PIN_1 3
 #define STEPPER_PIN_2 4

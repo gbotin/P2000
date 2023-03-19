@@ -5,10 +5,8 @@
 
 #include "defines.h"
 
-#define MOTOR_MODE AccelStepper::HALF4WIRE
-
 AccelStepper Motor(
-    MOTOR_MODE,
+    AccelStepper::HALF4WIRE,
     STEPPER_PIN_1,
     STEPPER_PIN_3,
     STEPPER_PIN_2,
