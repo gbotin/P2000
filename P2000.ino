@@ -116,23 +116,30 @@ void loop()
             Serial.println("---");
         }
 
-        if (command.startsWith("time_program"))
+        if (command.startsWith("scenario_for"))
         {
-            Serial.println("Current Time :");
-            Serial.println(getFormattedCurrentDateTime());
+            String arg = command.substring(command.indexOf(' ') + 1, command.length());
 
-            int sunrise = home.sunrise(year(), month(), day(), CE.locIsDST(now()));
-            int sunset = home.sunset(year(), month(), day(), CE.locIsDST(now()));
+            int dayArg = day();
+            int monthArg = month();
+            int yearArg = year();
 
-            char time[6];
-            Dusk2Dawn::min2str(time, sunrise);
-            Serial.println("Sunrise at " + String(time));
+            if (!arg.equals("today")) {
+                sscanf(arg.c_str(), "%2d/%2d/%4d", &dayArg, &monthArg, &yearArg);
+            }
 
-            Dusk2Dawn::min2str(time, sunset);
-            Serial.println("Sunset at " + String(time));
+            DateTime date(yearArg, monthArg, dayArg, 0, 0, 0);
+            time_t unixdate = date.unixtime();
 
-            Serial.println("Open at " + getFormattedTime(getOpenTime().unixtime()));
-            Serial.println("Close at " + getFormattedTime(getCloseTime().unixtime()));
+            Serial.println(".--------------------.");
+            Serial.println("|     " + getFormattedDate(unixdate) + "     |");
+            Serial.println(".--------------------.");
+            Serial.println("| Sunrise | " + getFormattedTime(getSunriseTime(unixdate)) + " |");
+            Serial.println("| Sunset  | " + getFormattedTime(getSunsetTime(unixdate)) + " |");
+            Serial.println("| Open    | " + getFormattedTime(getOpenTime(unixdate)) + " |");
+            Serial.println("| Close   | " + getFormattedTime(getCloseTime(unixdate)) + " |");
+            Serial.println(".--------------------.");
+            Serial.println("");
 
             Serial.println("---");
         }
@@ -160,34 +167,48 @@ void loop()
     delay(100);
 }
 
-DateTime getCloseTime()
+time_t getSunsetTime(time_t time)
 {
-    int close_time = home.sunset(year(), month(), day(), CE.locIsDST(now()));
-    int h_close_time = close_time / 60;
-    int m_close_time = close_time - (60 * h_close_time);
+    int sunset_time = home.sunset(year(time), month(time), day(time), CE.locIsDST(time));
+    int h_sunset_time = sunset_time / 60;
+    int m_sunset_time = sunset_time - (60 * h_sunset_time);
 
-    DateTime close_dt(year(), month(), day(), h_close_time, m_close_time, 0);
-    close_dt = close_dt + TimeSpan(S_DELTA_CLOSE);
-
-    DateTime close_min_dt(year(), month(), day(), 0, 0, 0);
-    close_min_dt = close_min_dt + TimeSpan(S_MIN_CLOSE);
-
-    return close_dt > close_min_dt ? close_dt : close_min_dt;
+    DateTime sunset_dt(year(time), month(time), day(time), h_sunset_time, m_sunset_time, 0);
+    return sunset_dt.unixtime();
 }
 
-DateTime getOpenTime()
+time_t getSunriseTime(time_t time)
 {
-    int open_time = home.sunrise(year(), month(), day(), CE.locIsDST(now()));
-    int h_open_time = open_time / 60;
-    int m_open_time = open_time - (60 * h_open_time);
+    int sunrise_time = home.sunrise(year(time), month(time), day(time), CE.locIsDST(time));
+    int h_sunrise_time = sunrise_time / 60;
+    int m_sunrise_time = sunrise_time - (60 * h_sunrise_time);
 
-    DateTime open_dt(year(), month(), day(), h_open_time, m_open_time, 0);
-    open_dt = open_dt + TimeSpan(S_DELTA_OPEN);
+    DateTime sunrise_dt(year(time), month(time), day(time), h_sunrise_time, m_sunrise_time, 0);
+    return sunrise_dt.unixtime();
+}
 
-    DateTime open_min_dt(year(), month(), day(), 0, 0, 0);
+time_t getCloseTime(time_t time)
+{
+    DateTime sunset_dt = DateTime(getSunsetTime(time));
+    DateTime close_dt = sunset_dt + TimeSpan(S_DELTA_CLOSE);
+
+    DateTime close_min_dt(year(time), month(time), day(time), 0, 0, 0);
+    close_min_dt = close_min_dt + TimeSpan(S_MIN_CLOSE);
+
+    DateTime read_close_dt = close_dt > close_min_dt ? close_dt : close_min_dt;
+    return read_close_dt.unixtime();
+}
+
+time_t getOpenTime(time_t time)
+{
+    DateTime sunrise_dt = DateTime(getSunriseTime(time));
+    DateTime open_dt = sunrise_dt + TimeSpan(S_DELTA_OPEN);
+
+    DateTime open_min_dt(year(time), month(time), day(time), 0, 0, 0);
     open_min_dt = open_min_dt + TimeSpan(S_MIN_OPEN);
 
-    return open_dt > open_min_dt ? open_dt : open_min_dt;
+    DateTime real_open_dt = open_dt > open_min_dt ? open_dt : open_min_dt;
+    return real_open_dt.unixtime();
 }
 
 // bool time_shouldClose()
@@ -237,6 +258,13 @@ String getFormattedTime(time_t t)
     return String(buffer);
 }
 
+String getFormattedDate(time_t t)
+{
+    char buffer[50];
+    sprintf(buffer, "%.2d/%.2d/%.4d", day(t), month(t), year(t));
+    return String(buffer);
+}
+
 String getFormattedDateTime(time_t t)
 {
     char buffer[50];
@@ -248,6 +276,13 @@ String getFormattedCurrentTime()
 {
     char buffer[50];
     sprintf(buffer, "%.2d:%.2d:%.2d", hour(), minute(), second());
+    return String(buffer);
+}
+
+String getFormattedCurrentDate()
+{
+    char buffer[50];
+    sprintf(buffer, "%.2d/%.2d/%.4d", day(), month(), year());
     return String(buffer);
 }
 
