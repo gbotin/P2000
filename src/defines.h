@@ -1,3 +1,5 @@
+#pragma once
+
 // LEDS
 #define LED_PIN 2
 

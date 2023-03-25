@@ -1,9 +1,4 @@
-#include <Arduino.h>
-
-// https://www.pjrc.com/teensy/td_libs_AccelStepper.html
-#include <AccelStepper.h>
-
-#include "defines.h"
+#include "door.h"
 
 AccelStepper Motor(
     AccelStepper::HALF4WIRE,

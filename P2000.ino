@@ -1,23 +1,4 @@
-// Utils :
-// Send current time via Serial : date +T%s\n > /dev/tty.usbserial-141410
-
-// TODO :
-// - update stepper lib to accelstepper
-// - buy rtc module
-// - homing step motor - buy homing switch
-
-// Infos :
-// Stepper : 28byj-48
-
-// http://suncalc.net/#/50.6244,2.6875,9/2023.12.01/15:34
-
-// FIFO readings
-// https://github.com/rlogiacco/CircularBuffer
-
-// https://github.com/adafruit/RTClib
 #include <RTClib.h>
-
-// #define SENSOR_PIN A0
 
 #include "src/defines.h"
 #include "src/controls.h"
@@ -111,22 +92,6 @@ void loop()
 
     delay(100);
 }
-
-// working - not needed
-// void showLuminosity()
-// {
-//     int value = analogRead(SENSOR_PIN);
-//   Serial.println("Current luminosity is " + value);
-
-//   if (value > 500)
-//   {
-//     digitalWrite(LED_PIN, HIGH);
-//   }
-//   else
-//   {
-//     digitalWrite(LED_PIN, LOW);
-//   }
-// }
 
 time_t requestSync()
 {

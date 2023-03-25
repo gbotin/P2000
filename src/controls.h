@@ -1,3 +1,8 @@
+#include "defines.h"
+
+// https://github.com/JChristensen/JC_Button
+#include <JC_Button.h>
+
 bool ctrl_move();
 bool ctrl_set();
 bool ctrl_toggle();

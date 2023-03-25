@@ -1,6 +1,17 @@
+#include "defines.h"
+
+// https://github.com/adafruit/RTClib
+#include <RTClib.h>
+
 // https://github.com/PaulStoffregen/Time
 #include <Time.h>
 #include <TimeLib.h>
+
+// http://github.com/JChristensen/Timezone
+#include <Timezone.h>
+
+// https://github.com/dmkishi/Dusk2Dawn
+#include <Dusk2Dawn.h>
 
 String time_getTimeFormat(time_t t);
 String time_getDateFormat(time_t t);

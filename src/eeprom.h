@@ -1,3 +1,7 @@
+#include "defines.h"
+#include <Arduino.h>
+#include <EEPROM.h>
+
 long eeprom_readLong(long address);
 void eeprom_updateLong(int address, long value);
 

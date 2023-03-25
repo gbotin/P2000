@@ -1,17 +1,4 @@
-#include "defines.h"
-
-// https://github.com/adafruit/RTClib
-#include <RTClib.h>
-
-// https://github.com/PaulStoffregen/Time
-#include <Time.h>
-#include <TimeLib.h>
-
-// http://github.com/JChristensen/Timezone
-#include <Timezone.h>
-
-// https://github.com/dmkishi/Dusk2Dawn
-#include <Dusk2Dawn.h>
+#include "time.h"
 
 const TimeChangeRule CEST = {"CEST", Last, Sun, Mar, 2, 120}; // Central European Summer Time
 const TimeChangeRule CET = {"CET", Last, Sun, Oct, 3, 60};    // Central European Standard Time

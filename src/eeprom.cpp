@@ -1,6 +1,4 @@
-#include "defines.h"
-#include <Arduino.h>
-#include <EEPROM.h>
+#include "eeprom.h"
 
 long eeprom_readLong(long address)
 {

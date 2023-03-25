@@ -1,7 +1,4 @@
-#include "defines.h"
-
-// https://github.com/JChristensen/JC_Button
-#include <JC_Button.h>
+#include "controls.h"
 
 Button RunButton(RUN_PIN);
 Button HomeButton(HOME_PIN);
