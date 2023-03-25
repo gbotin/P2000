@@ -27,48 +27,47 @@ String time_getDateTimeFormat(time_t t)
     return String(buffer);
 }
 
-time_t time_getSunset(time_t time)
+time_t time_getCycleTime(SunCycle cycle, time_t time)
 {
-    int sunset_time = location.sunset(year(time), month(time), day(time), CE.locIsDST(time));
-    int h_sunset_time = sunset_time / 60;
-    int m_sunset_time = sunset_time - (60 * h_sunset_time);
+    int cycle_time;
+    if (cycle == SunCycle::Sunrise)
+    {
+        cycle_time = location.sunrise(year(time), month(time), day(time), CE.locIsDST(time));
+    }
 
-    DateTime sunset_dt(year(time), month(time), day(time), h_sunset_time, m_sunset_time, 0);
-    return sunset_dt.unixtime();
+    if (cycle == SunCycle::Sunset)
+    {
+        cycle_time = location.sunset(year(time), month(time), day(time), CE.locIsDST(time));
+    }
+
+    int h_cycle_time = cycle_time / 60;
+    int m_cycle_time = cycle_time - (60 * h_cycle_time);
+
+    DateTime cycle_dt(year(time), month(time), day(time), h_cycle_time, m_cycle_time, 0);
+    return cycle_dt.unixtime();
 }
 
-time_t time_getSunrise(time_t time)
+time_t time_getActionTime(Action action, time_t time)
 {
-    int sunrise_time = location.sunrise(year(time), month(time), day(time), CE.locIsDST(time));
-    int h_sunrise_time = sunrise_time / 60;
-    int m_sunrise_time = sunrise_time - (60 * h_sunrise_time);
+    DateTime action_dt;
+    DateTime action_min_dt(year(time), month(time), day(time));
 
-    DateTime sunrise_dt(year(time), month(time), day(time), h_sunrise_time, m_sunrise_time, 0);
-    return sunrise_dt.unixtime();
-}
+    if (action == Action::Open)
+    {
+        action_dt = DateTime(time_getCycleTime(SunCycle::Sunrise, time));
+        action_dt = action_dt + TimeSpan(S_DELTA_OPEN);
+        action_min_dt = action_min_dt + TimeSpan(S_MIN_OPEN);
+    }
 
-time_t time_getCloseTime(time_t time)
-{
-    DateTime sunset_dt = DateTime(time_getSunset(time));
-    DateTime close_dt = sunset_dt + TimeSpan(S_DELTA_CLOSE);
+    if (action == Action::Close)
+    {
+        action_dt = DateTime(time_getCycleTime(SunCycle::Sunset, time));
+        action_dt = action_dt + TimeSpan(S_DELTA_CLOSE);
+        action_min_dt = action_min_dt + TimeSpan(S_MIN_CLOSE);
+    };
 
-    DateTime close_min_dt(year(time), month(time), day(time));
-    close_min_dt = close_min_dt + TimeSpan(S_MIN_CLOSE);
-
-    DateTime read_close_dt = close_dt > close_min_dt ? close_dt : close_min_dt;
-    return read_close_dt.unixtime();
-}
-
-time_t time_getOpenTime(time_t time)
-{
-    DateTime sunrise_dt = DateTime(time_getSunrise(time));
-    DateTime open_dt = sunrise_dt + TimeSpan(S_DELTA_OPEN);
-
-    DateTime open_min_dt(year(time), month(time), day(time));
-    open_min_dt = open_min_dt + TimeSpan(S_MIN_OPEN);
-
-    DateTime real_open_dt = open_dt > open_min_dt ? open_dt : open_min_dt;
-    return real_open_dt.unixtime();
+    DateTime real_action_dt = action_dt > action_min_dt ? action_dt : action_min_dt;
+    return real_action_dt.unixtime();
 }
 
 void time_setSystemTime(time_t time, bool local = true)
@@ -84,29 +83,11 @@ void time_printScenario(time_t time)
     Serial.println(".--------------------.");
     Serial.println("|     " + time_getDateFormat(time) + "     |");
     Serial.println(".--------------------.");
-    Serial.println("| Sunrise | " + time_getTimeFormat(time_getSunrise(time)) + " |");
-    Serial.println("| Sunset  | " + time_getTimeFormat(time_getSunset(time)) + " |");
-    Serial.println("| Open    | " + time_getTimeFormat(time_getOpenTime(time)) + " |");
-    Serial.println("| Close   | " + time_getTimeFormat(time_getCloseTime(time)) + " |");
+    Serial.println("| Sunrise | " + time_getTimeFormat(time_getCycleTime(SunCycle::Sunrise, time)) + " |");
+    Serial.println("| Sunset  | " + time_getTimeFormat(time_getCycleTime(SunCycle::Sunset, time)) + " |");
+    Serial.println("| Open    | " + time_getTimeFormat(time_getActionTime(Action::Open, time)) + " |");
+    Serial.println("| Close   | " + time_getTimeFormat(time_getActionTime(Action::Close, time)) + " |");
     Serial.println(".--------------------.");
     Serial.println("");
     Serial.println("---");
 }
-
-// bool time_shouldClose()
-// {
-//     int sunset = home.sunset(year(), month(), day(), CE.locIsDST(now()));
-
-//     !door_isClose();
-
-//     return false;
-// }
-
-// bool time_shouldOpen()
-// {
-//     int sunrise = home.sunrise(year(), month(), day(), CE.locIsDST(now()));
-
-//     !door_isOpen();
-
-//     return false;
-// }

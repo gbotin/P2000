@@ -42,3 +42,15 @@ enum Direction
     Up,
     Down
 };
+
+enum SunCycle
+{
+    Sunrise,
+    Sunset
+};
+
+enum Action
+{
+    Open,
+    Close,
+};
