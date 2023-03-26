@@ -1,5 +1,6 @@
+#pragma once
+
 #include "defines.h"
-#include <Arduino.h>
 #include <EEPROM.h>
 
 long eeprom_readLong(long address);

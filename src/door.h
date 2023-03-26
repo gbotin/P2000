@@ -1,6 +1,6 @@
-#include "defines.h"
+#pragma once
 
-#include <Arduino.h>
+#include "defines.h"
 
 // https://www.pjrc.com/teensy/td_libs_AccelStepper.html
 #include <AccelStepper.h>

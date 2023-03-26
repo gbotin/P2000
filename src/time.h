@@ -1,3 +1,5 @@
+#pragma once
+
 #include "defines.h"
 
 // https://github.com/adafruit/RTClib

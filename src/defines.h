@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Arduino.h>
+
 // LEDS
 #define LED_PIN 2
 
