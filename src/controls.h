@@ -5,9 +5,10 @@
 // https://github.com/JChristensen/JC_Button
 #include <JC_Button.h>
 
-bool ctrl_set();
+bool ctrl_mode();
 bool ctrl_home();
 bool ctrl_move();
+bool ctrl_run();
 void ctrl_read();
 void ctrl_setup();
 bool ctrl_isDirectionUp();

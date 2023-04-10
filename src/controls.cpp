@@ -4,7 +4,7 @@ Button RunButton(RUN_PIN);
 Button HomeButton(HOME_PIN);
 
 // Home and Run buttons pressed for 1s
-bool ctrl_set()
+bool ctrl_mode()
 {
     return RunButton.pressedFor(1000) && HomeButton.pressedFor(1000);
 }
@@ -19,6 +19,12 @@ bool ctrl_home()
 bool ctrl_move()
 {
     return RunButton.pressedFor(1000) && HomeButton.releasedFor(500);
+}
+
+// Run button was pressed
+bool ctrl_run()
+{
+    return RunButton.wasReleased();
 }
 
 void ctrl_read()

@@ -58,3 +58,9 @@ enum Action
     Open,
     Close,
 };
+
+enum Mode
+{
+    Auto,
+    Set,
+};

@@ -6,9 +6,8 @@
 #include "src/door.h"
 #include "src/eeprom.h"
 #include "src/led.h"
+#include "src/mode.h"
 #include "src/time.h"
-
-bool mode_set = true;
 
 void setup()
 {
@@ -16,7 +15,7 @@ void setup()
 
     pinMode(LED_PIN, OUTPUT);
 
-    led_setState(LED_PIN, mode_set);
+    led_setState(LED_PIN, mode_is(Mode::Set));
 
     //   setSyncProvider(requestSync); // Set function to call when sync required
 
@@ -37,15 +36,20 @@ void loop()
     command_try("date_set", &command_dateSet);
     command_try("scenario_for", &command_scenarioFor);
 
-    if (ctrl_set())
+    if (ctrl_mode())
     {
-        mode_set = !mode_set;
-        led_setState(LED_PIN, mode_set);
+        mode_toggle();
+        led_setState(LED_PIN, mode_is(Mode::Set));
         delay(1000);
     }
 
-    if (mode_set)
+    if (mode_is(Mode::Set))
     {
+        if (ctrl_run())
+        {
+            door_toggle(ctrl_getDirection(), &eeprom_setCurrPosition);
+        }
+
         if (ctrl_move())
         {
             door_move(ctrl_getDirection(), &ctrl_move, &ctrl_read, &eeprom_setCurrPosition);
@@ -57,9 +61,10 @@ void loop()
             led_blink(LED_PIN, 1);
         }
     }
-    else
+
+    if (mode_is(Mode::Auto))
     {
-        if (time_isSet())
+        if (!time_isSet())
         {
             return;
         }
