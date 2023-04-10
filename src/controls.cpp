@@ -3,19 +3,20 @@
 Button RunButton(RUN_PIN);
 Button HomeButton(HOME_PIN);
 
-bool ctrl_move()
+// Home and Run buttons pressed for 1s
+bool ctrl_set()
 {
     return RunButton.pressedFor(1000) && HomeButton.pressedFor(1000);
 }
 
 // Home button pressed for 1s and run button was not pressed last 0,5s
-bool ctrl_set()
+bool ctrl_home()
 {
     return HomeButton.pressedFor(1000) && RunButton.releasedFor(500);
 }
 
 // Run button pressed for 1s and home button was not pressed last 0,5s
-bool ctrl_toggle()
+bool ctrl_move()
 {
     return RunButton.pressedFor(1000) && HomeButton.releasedFor(500);
 }

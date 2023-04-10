@@ -15,6 +15,7 @@
 // https://github.com/dmkishi/Dusk2Dawn
 #include <Dusk2Dawn.h>
 
+bool time_isSet();
 String time_getTimeFormat(time_t t);
 String time_getDateFormat(time_t t);
 String time_getDateTimeFormat(time_t t);

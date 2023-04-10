@@ -16,6 +16,8 @@
 #define TMZ 1
 
 // DOOR TIMING
+#define TIME_SET_TESTTIME 946681200; // 2000-01-01 00:00:00 GMT+0
+
 #define S_DELTA_OPEN 0     // 0H
 #define S_DELTA_CLOSE 3600 // 1H
 
@@ -42,13 +44,13 @@
 enum Direction
 {
     Up,
-    Down
+    Down,
 };
 
 enum SunCycle
 {
     Sunrise,
-    Sunset
+    Sunset,
 };
 
 enum Action

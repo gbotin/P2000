@@ -6,6 +6,11 @@ Timezone CE(CEST, CET);
 
 Dusk2Dawn location(LAT, LNG, TMZ);
 
+bool time_isSet()
+{
+    return now() < TIME_SET_TESTTIME;
+}
+
 String time_getTimeFormat(time_t t)
 {
     char buffer[50];
