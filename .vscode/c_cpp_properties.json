@@ -18,10 +18,11 @@
             "includePath": [
                 "/Users/gbotin/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino",
                 "/Users/gbotin/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/variants/eightanaloginputs",
+                "/Users/gbotin/Documents/Arduino/libraries/Low-Power-master",
+                "/Users/gbotin/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/libraries/EEPROM/src",
                 "/Users/gbotin/Documents/Arduino/libraries/RTClib/src",
                 "/Users/gbotin/Documents/Arduino/libraries/Adafruit_BusIO",
                 "/Users/gbotin/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/libraries/Wire/src",
-                "/Users/gbotin/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/libraries/EEPROM/src",
                 "/Users/gbotin/Documents/Arduino/libraries/Time",
                 "/Users/gbotin/Documents/Arduino/libraries/Timezone/src",
                 "/Users/gbotin/Documents/Arduino/libraries/Dusk2Dawn",

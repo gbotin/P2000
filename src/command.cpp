@@ -27,7 +27,7 @@ void command_try(String name, void (*callback)(String command))
 void command_eepromReset(String command)
 {
     eeprom_reset();
-    led_blink(LED_PIN, 2, 500);
+    led_blink(LED_PIN, 5);
 }
 
 void command_timeSet(String command)

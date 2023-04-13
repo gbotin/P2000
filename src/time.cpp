@@ -6,10 +6,7 @@ Timezone CE(CEST, CET);
 
 Dusk2Dawn location(LAT, LNG, TMZ);
 
-bool time_isSet()
-{
-    return now() > TIME_SET_TESTTIME;
-}
+RTC_DS1307 rtc;
 
 String time_getTimeFormat(time_t t)
 {
@@ -30,6 +27,20 @@ String time_getDateTimeFormat(time_t t)
     char buffer[50];
     sprintf(buffer, "%.2d/%.2d/%.4d %.2d:%.2d:%.2d", day(t), month(t), year(t), hour(t), minute(t), second(t));
     return String(buffer);
+}
+
+void time_setup()
+{
+    if (!rtc.begin())
+    {
+        Serial.println("Couldn't find RTC");
+        Serial.flush();
+        while (1);
+    }
+
+    rtc.writeSqwPinMode(DS1307_OFF);
+    setSyncProvider(time_getRTCTime);
+    setSyncInterval(1);
 }
 
 time_t time_getCycleTime(SunCycle cycle, time_t time)
@@ -75,9 +86,14 @@ time_t time_getActionTime(Action action, time_t time)
     return real_action_dt.unixtime();
 }
 
+time_t time_getRTCTime()
+{
+    return rtc.now().unixtime();
+}
+
 void time_setSystemTime(time_t time, bool local = true)
 {
-    setTime(local ? CE.toLocal(time) : time);
+    rtc.adjust(local ? CE.toLocal(time) : time);
 
     Serial.println("Time set to : " + time_getDateTimeFormat(now()));
     Serial.println("---");

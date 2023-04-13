@@ -1,11 +1,3 @@
-Utils :
-Send current time via Serial : date +T%s\n > /dev/tty.usbserial-141410
-
-TODO :
-- update stepper lib to accelstepper
-- buy rtc module
-- homing step motor - buy homing switch
-
 Infos :
 Stepper : 28byj-48
 
