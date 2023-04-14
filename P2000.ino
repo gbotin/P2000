@@ -99,7 +99,9 @@ void loop()
         }
 
         if (millis() >= lastwake + 10000) {
+            door_powerDown();
             delay(1000);
+
             LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
         }
     }

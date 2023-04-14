@@ -11,6 +11,14 @@ long currPosition = 0;
 long openPosition = 0;
 long closePosition = 0;
 
+void door_powerDown()
+{
+    digitalWrite(STEPPER_PIN_1, LOW);
+    digitalWrite(STEPPER_PIN_2, LOW);
+    digitalWrite(STEPPER_PIN_3, LOW);
+    digitalWrite(STEPPER_PIN_4, LOW);
+}
+
 bool door_isClose()
 {
     return currPosition == closePosition;
