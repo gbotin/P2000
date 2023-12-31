@@ -30,3 +30,15 @@ https://github.com/adafruit/RTClib
 - http://github.com/JChristensen/Timezone
 - https://github.com/arduino-libraries/Stepper
 - https://github.com/dmkishi/Dusk2Dawn
+
+
+
+### Power Consumption
+
+Mode SET idle : 0.0358V
+Motor running 
+
+sleep 0.146
+
+
+max 0.2620

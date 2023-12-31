@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "MCU")(type "Legacy")(uri "/Users/gbotin/Desktop/MCU_Module/MCU_Module.lib")(options "")(descr ""))
+  (lib (name "LED")(type "Legacy")(uri "/Users/gbotin/Desktop/LED/LED.lib")(options "")(descr ""))
+)

@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "P2000")(type "KiCad")(uri "${KIPRJMOD}/components.pretty")(options "")(descr ""))
+  (lib (name "Clock")(type "KiCad")(uri "/Users/gbotin/Desktop/kicad/CrumpPrints.pretty")(options "")(descr ""))
+)
